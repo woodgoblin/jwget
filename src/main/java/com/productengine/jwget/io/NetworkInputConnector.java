@@ -5,7 +5,6 @@ import com.sun.istack.internal.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 
 import static java.lang.Math.min;
 
@@ -25,7 +24,7 @@ public class NetworkInputConnector implements InputConnector {
             throw new IllegalArgumentException("offset can't be less then 0");
 
         if (length < 0)
-            throw new RuntimeException("length can't be less then 0");
+            throw new IllegalArgumentException("length can't be less then 0");
 
         if (offset < currentOffset)
             throw new RuntimeException("Rollbacks are not supported");
@@ -62,11 +61,6 @@ public class NetworkInputConnector implements InputConnector {
                 bytesLeft--;
 
             return readByte;
-        }
-
-        @Override
-        public synchronized int read(byte b[]) throws IOException {
-            return read(b, 0, b.length);
         }
 
         @Override
@@ -116,6 +110,10 @@ public class NetworkInputConnector implements InputConnector {
         @Override
         public synchronized void close() throws IOException {
             skip(bytesLeft);
+
+            if (inputStream.available() < 1) {
+                inputStream.close();
+            }
         }
 
     }

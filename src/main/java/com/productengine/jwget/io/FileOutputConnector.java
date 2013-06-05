@@ -36,17 +36,17 @@ public class FileOutputConnector implements OutputConnector {
         }
 
         @Override
-        public void write(int b) {
+        public synchronized void write(int b) {
             outputStream.write(b);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) {
+        public synchronized void write(byte[] b, int off, int len) {
             outputStream.write(b, off, len);
         }
 
-        public void flush() throws IOException {
-            try (FileLock fileLock = file.getChannel().lock()) {
+        public synchronized void flush() throws IOException {
+            try (FileLock fileLock = file.getChannel().lock(offset, outputStream.size(), true)) {
                 long currentPosition = file.getFilePointer();
 
                 try {
@@ -59,7 +59,7 @@ public class FileOutputConnector implements OutputConnector {
         }
 
         @Override
-        public void close() throws IOException {
+        public synchronized void close() throws IOException {
             flush();
         }
     }

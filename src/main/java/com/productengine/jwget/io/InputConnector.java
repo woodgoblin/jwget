@@ -4,6 +4,6 @@ import java.io.InputStream;
 
 public interface InputConnector {
 
-    InputStream getInputStream();
+    InputStream getSubStream(long offset, long length);
 
 }

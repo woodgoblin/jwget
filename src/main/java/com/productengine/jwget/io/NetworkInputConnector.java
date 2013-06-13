@@ -1,6 +1,7 @@
 package com.productengine.jwget.io;
 
-import com.sun.istack.internal.NotNull;
+import com.productengine.jwget.utils.Factory;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;

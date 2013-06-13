@@ -27,6 +27,7 @@ public class Downloader implements Runnable {
     public void run() {
         while (chunkIterator.hasNext()) {
             ChunkGenerator.Chunk chunk = chunkIterator.next();
+
             try (
                     InputStream inputStream = inputConnector.getSubStream(chunk.getOffset(), chunk.getLength());
                     OutputStream outputStream = outputConnector.getSubStream(chunk.getOffset(), chunk.getLength());

@@ -1,5 +1,6 @@
 package com.productengine.jwget.io;
 
+import com.productengine.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -62,5 +63,7 @@ public class FileOutputConnector implements OutputConnector {
         public synchronized void close() throws IOException {
             flush();
         }
+
     }
+
 }

@@ -1,8 +1,6 @@
 package com.productengine.jwget;
 
 import com.productengine.jwget.utils.ChunkGenerator;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Iterator;

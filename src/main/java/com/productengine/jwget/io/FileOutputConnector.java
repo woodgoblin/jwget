@@ -50,7 +50,7 @@ public class FileOutputConnector implements OutputConnector {
 
         @Override
         public void flush() throws IOException {
-            try (FileLock fileLock = file.getChannel().lock(offset, outputStream.size(), true)) {
+            synchronized (file) {
                 long currentPosition = file.getFilePointer();
 
                 try {

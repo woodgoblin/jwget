@@ -29,7 +29,7 @@ public class Application {
         LOGGER.info("Workers count: {}", workersCount);
         LOGGER.info("Chunk size: {}", chunkSize);
 
-        Iterator<ChunkGenerator.Chunk> chunkIterator = new ChunkGenerator(url.openConnection().getContentLength(), 10).iterator();
+        Iterator<ChunkGenerator.Chunk> chunkIterator = new ChunkGenerator(url.openConnection().getContentLength(), chunkSize).iterator();
         NetworkInputConnectorFactory inputConnectorFactory = new NetworkInputConnectorFactory(url);
         try (RandomAccessFile file = new RandomAccessFile(destination, "rws")) {
             FileOutputConnectorFactory outputConnectorFactory = new FileOutputConnectorFactory(file);

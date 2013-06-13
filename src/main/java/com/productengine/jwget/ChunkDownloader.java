@@ -36,6 +36,7 @@ public class ChunkDownloader implements Runnable {
                     InputStream inputStream = inputConnector.getSubstream(chunk.getOffset(), chunk.getLength());
                     OutputStream outputStream = outputConnector.getSubstream(chunk.getOffset(), chunk.getLength());
             ) {
+                LOGGER.info("Downloading of {}", chunk);
                 copyLarge(inputStream, outputStream);
             } catch (IOException e) {
                 LOGGER.error("Failed to download chunk", e);

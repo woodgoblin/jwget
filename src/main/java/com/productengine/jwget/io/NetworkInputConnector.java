@@ -1,6 +1,5 @@
 package com.productengine.jwget.io;
 
-import com.productengine.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class NetworkInputConnector implements InputConnector {
     }
 
     @Override
-    public synchronized InputStream getSubStream(long offset, long length) {
+    public synchronized InputStream getSubstream(long offset, long length) {
         if (offset < 0)
             throw new IllegalArgumentException("offset can't be less then 0");
 
@@ -44,7 +43,7 @@ public class NetworkInputConnector implements InputConnector {
     protected static class SubStream extends InputStream {
 
         protected final InputStream inputStream;
-        protected volatile long bytesLeft;
+        protected long bytesLeft;
 
         public SubStream(@NotNull InputStream inputStream, long bytesLeft) {
             this.inputStream = inputStream;
@@ -52,7 +51,7 @@ public class NetworkInputConnector implements InputConnector {
         }
 
         @Override
-        public synchronized int read() throws IOException {
+        public int read() throws IOException {
             if (bytesLeft < 1)
                 return -1;
 
@@ -65,37 +64,12 @@ public class NetworkInputConnector implements InputConnector {
         }
 
         @Override
-        public synchronized int read(byte b[], int off, int len) throws IOException {
-            if (b == null) {
-                throw new NullPointerException();
-            } else if (off < 0 || len < 0 || len > b.length - off) {
-                throw new IndexOutOfBoundsException();
-            } else if (len == 0) {
-                return 0;
-            }
-
-            int c = read();
-            if (c == -1) {
-                return -1;
-            }
-            b[off] = (byte)c;
-
-            int i = 1;
-            try {
-                for (; i < len ; i++) {
-                    c = read();
-                    if (c == -1) {
-                        break;
-                    }
-                    b[off + i] = (byte)c;
-                }
-            } catch (IOException ee) {
-            }
-            return i;
+        public int read(byte b[], int off, int len) throws IOException {
+            return super.read(b, off, len);
         }
 
         @Override
-        public synchronized long skip(long n) throws IOException {
+        public long skip(long n) throws IOException {
             long bytesSkipped = inputStream.skip(min(n, bytesLeft));
 
             bytesLeft -= bytesSkipped;
@@ -104,12 +78,12 @@ public class NetworkInputConnector implements InputConnector {
         }
 
         @Override
-        public synchronized int available() throws IOException {
+        public int available() {
             return (int) bytesLeft;
         }
 
         @Override
-        public synchronized void close() throws IOException {
+        public void close() throws IOException {
             skip(bytesLeft);
 
             if (inputStream.available() < 1) {
@@ -118,5 +92,4 @@ public class NetworkInputConnector implements InputConnector {
         }
 
     }
-
 }

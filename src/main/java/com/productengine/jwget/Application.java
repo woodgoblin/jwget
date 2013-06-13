@@ -1,6 +1,9 @@
 package com.productengine.jwget;
 
-import com.productengine.jwget.io.*;
+import com.productengine.jwget.io.FileOutputConnectorFactory;
+import com.productengine.jwget.io.InputConnector;
+import com.productengine.jwget.io.NetworkInputConnectorFactory;
+import com.productengine.jwget.io.OutputConnector;
 import com.productengine.jwget.utils.ChunkGenerator;
 import com.productengine.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.Iterator;
@@ -38,7 +40,7 @@ public class Application {
         }
     }
 
-    private static void download(
+    public static void download(
             final @NotNull Factory<? extends InputConnector> inputConnectorFactory,
             final @NotNull Factory<? extends OutputConnector> outputConnectorFactory,
             final @NotNull Iterator<ChunkGenerator.Chunk> chunkIterator,

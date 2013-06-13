@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface Factory<T> {
 
-    @NotNull T create() throws Exception;
+    @NotNull
+    T create() throws Exception;
 
 }

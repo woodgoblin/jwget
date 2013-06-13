@@ -1,9 +1,11 @@
 package com.productengine.jwget.io;
 
-import com.productengine.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 
 public class FileOutputConnector implements OutputConnector {
@@ -14,39 +16,40 @@ public class FileOutputConnector implements OutputConnector {
         this.file = file;
     }
 
+    @NotNull
     @Override
-    public OutputStream getSubStream(long offset, long length) {
-        return new SubStream(file, offset, length);
+    public OutputStream getSubstream(long offset, long length) {
+        return new BufferedSubstream(file, offset, length);
     }
 
-    protected static class SubStream extends OutputStream {
+    protected static class BufferedSubstream extends OutputStream {
 
         protected final RandomAccessFile file;
-        protected final long offset;
 
+        protected final long offset;
         protected final ByteArrayOutputStream outputStream;
 
-        public SubStream(@NotNull RandomAccessFile file, long offset, long length) {
+        public BufferedSubstream(@NotNull RandomAccessFile file, long offset, long length) {
             if (length > Integer.MAX_VALUE)
                 throw new RuntimeException("length bigger then Integer.MAX_VALUE isn't supported");
 
             this.file = file;
             this.offset = offset;
-
             this.outputStream = new ByteArrayOutputStream((int) length);
         }
 
         @Override
-        public synchronized void write(int b) {
+        public void write(int b) {
             outputStream.write(b);
         }
 
         @Override
-        public synchronized void write(byte[] b, int off, int len) {
+        public void write(byte[] b, int off, int len) {
             outputStream.write(b, off, len);
         }
 
-        public synchronized void flush() throws IOException {
+        @Override
+        public void flush() throws IOException {
             try (FileLock fileLock = file.getChannel().lock(offset, outputStream.size(), true)) {
                 long currentPosition = file.getFilePointer();
 
@@ -60,10 +63,9 @@ public class FileOutputConnector implements OutputConnector {
         }
 
         @Override
-        public synchronized void close() throws IOException {
+        public void close() throws IOException {
             flush();
         }
-
     }
 
 }

@@ -3,7 +3,6 @@ package com.productengine.jwget.utils;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 
 import static com.google.common.base.Objects.toStringHelper;
 import static java.lang.Math.min;

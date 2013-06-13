@@ -1,9 +1,12 @@
 package com.productengine.jwget.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.InputStream;
 
 public interface InputConnector {
 
-    InputStream getSubStream(long offset, long length);
+    @NotNull
+    InputStream getSubstream(long offset, long length);
 
 }

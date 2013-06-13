@@ -3,6 +3,8 @@ package com.productengine.jwget;
 import com.productengine.jwget.io.InputConnector;
 import com.productengine.jwget.io.OutputConnector;
 import com.productengine.jwget.utils.ChunkGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +14,8 @@ import java.util.Iterator;
 import static org.apache.commons.io.IOUtils.copyLarge;
 
 public class Downloader implements Runnable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Downloader.class);
 
     private final InputConnector inputConnector;
     private final OutputConnector outputConnector;
@@ -29,12 +33,12 @@ public class Downloader implements Runnable {
             ChunkGenerator.Chunk chunk = chunkIterator.next();
 
             try (
-                    InputStream inputStream = inputConnector.getSubStream(chunk.getOffset(), chunk.getLength());
-                    OutputStream outputStream = outputConnector.getSubStream(chunk.getOffset(), chunk.getLength());
+                    InputStream inputStream = inputConnector.getSubstream(chunk.getOffset(), chunk.getLength());
+                    OutputStream outputStream = outputConnector.getSubstream(chunk.getOffset(), chunk.getLength());
             ) {
                 copyLarge(inputStream, outputStream);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to download chunk", e);
             }
         }
     }

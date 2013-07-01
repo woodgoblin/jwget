@@ -7,42 +7,37 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.base.Objects.toStringHelper;
 import static java.lang.Math.min;
 
-public class ChunkGenerator implements Iterable<ChunkGenerator.Chunk> {
+public class ChunkGenerator implements Iterator<ChunkGenerator.Chunk> {
 
     private final long totalSize;
     private final long chunkSize;
 
+    private final AtomicLong offset;
+
     public ChunkGenerator(long totalSize, long chunkSize) {
         this.totalSize = totalSize;
         this.chunkSize = chunkSize;
+
+        this.offset = new AtomicLong(0);
     }
 
     @Override
-    public Iterator<Chunk> iterator() {
-        return new Iterator<Chunk>() {
+    public boolean hasNext() {
+        return offset.get() < totalSize;
+    }
 
-            private final AtomicLong offset = new AtomicLong(0);
+    @Override
+    public Chunk next() {
+        while (true) {
+            long currentOffset = offset.get();
+            long currentChunkSize = min(totalSize - currentOffset, chunkSize);
 
-            @Override
-            public boolean hasNext() {
-                return offset.get() < totalSize;
-            }
+            if (currentChunkSize <= 0)
+                throw new NoSuchElementException();
 
-            @Override
-            public Chunk next() {
-                while (true) {
-                    long currentOffset = offset.get();
-                    long currentChunkSize = min(totalSize - currentOffset, chunkSize);
-
-                    if (currentChunkSize <= 0)
-                        throw new NoSuchElementException();
-
-                    if (offset.compareAndSet(currentOffset, currentOffset + currentChunkSize))
-                        return new ImmutableChunk(currentOffset, currentChunkSize);
-                }
-            }
-
-        };
+            if (offset.compareAndSet(currentOffset, currentOffset + currentChunkSize))
+                return new ImmutableChunk(currentOffset, currentChunkSize);
+        }
     }
 
     public static interface Chunk {
@@ -92,7 +87,6 @@ public class ChunkGenerator implements Iterable<ChunkGenerator.Chunk> {
             result = 31 * result + (int) (length ^ (length >>> 32));
             return result;
         }
-
 
         @Override
         public String toString() {

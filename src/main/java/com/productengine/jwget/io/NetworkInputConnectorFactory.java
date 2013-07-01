@@ -16,8 +16,12 @@ public class NetworkInputConnectorFactory implements Factory<NetworkInputConnect
 
     @NotNull
     @Override
-    public NetworkInputConnector create() throws IOException {
-        return new NetworkInputConnector(url);
+    public NetworkInputConnector create() throws CreationException {
+        try {
+            return new NetworkInputConnector(url);
+        } catch (IOException e) {
+            throw new CreationException(e);
+        }
     }
 
 }

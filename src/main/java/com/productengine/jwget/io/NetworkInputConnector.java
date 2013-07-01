@@ -104,7 +104,7 @@ public class NetworkInputConnector implements InputConnector {
                 skip(bytesLeft);
 
                 // TODO: fix this
-                if (inputStream.available() < 1) {
+                if (inputStream.available() == 0) {
                     inputStream.close();
                 }
             }

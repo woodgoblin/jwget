@@ -7,7 +7,6 @@ import com.productengine.jwget.io.OutputConnector;
 import com.productengine.jwget.utils.ChunkGenerator;
 import com.productengine.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,8 +26,6 @@ public class DownloaderTest {
         final byte[] expected = "oololoololoololololoololoololoololoololoololoololoololooololoololoololololo".getBytes();
         final byte[] actual = new byte[expected.length];
 
-        ChunkGenerator chunks = new ChunkGenerator(expected.length, 32);
-
         downloader.download(
                 new Factory<InputConnector>() {
                     @NotNull
@@ -40,11 +37,11 @@ public class DownloaderTest {
                 new Factory<OutputConnector>() {
                     @NotNull
                     @Override
-                    public OutputConnector create() throws Exception {
+                    public OutputConnector create() throws CreationException {
                         return new ByteArrayOutputConnector(actual);
                     }
                 },
-                chunks.iterator(),
+                new ChunkGenerator(expected.length, 32),
                 1
         );
 
@@ -56,8 +53,6 @@ public class DownloaderTest {
         final byte[] expected = "oololoololoololololoololoololoololoololoololoololoololooololoololoololololo".getBytes();
         final byte[] actual = new byte[expected.length];
 
-        ChunkGenerator chunks = new ChunkGenerator(expected.length, 32);
-
         downloader.download(
                 new Factory<InputConnector>() {
                     @NotNull
@@ -69,11 +64,11 @@ public class DownloaderTest {
                 new Factory<OutputConnector>() {
                     @NotNull
                     @Override
-                    public OutputConnector create() throws Exception {
+                    public OutputConnector create() throws CreationException {
                         return new ByteArrayOutputConnector(actual);
                     }
                 },
-                chunks.iterator(),
+                new ChunkGenerator(expected.length, 32),
                 10
         );
 
@@ -86,8 +81,6 @@ public class DownloaderTest {
         final byte[] expected = "oololoololoololololoololoololoololoololoololoololoololooololoololoololololo".getBytes();
         final byte[] actual = new byte[expected.length];
 
-        ChunkGenerator chunks = new ChunkGenerator(expected.length + 5, 32);
-
         downloader.download(
                 new Factory<InputConnector>() {
                     @NotNull
@@ -99,11 +92,11 @@ public class DownloaderTest {
                 new Factory<OutputConnector>() {
                     @NotNull
                     @Override
-                    public OutputConnector create() throws Exception {
+                    public OutputConnector create() throws CreationException {
                         return new ByteArrayOutputConnector(actual);
                     }
                 },
-                chunks.iterator(),
+                new ChunkGenerator(expected.length + 5, 32),
                 10
         );
 

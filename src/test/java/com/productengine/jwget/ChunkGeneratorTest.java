@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,12 +18,10 @@ public class ChunkGeneratorTest {
 
     @Test
     public void testLastChunk() {
-        ChunkGenerator chunkGenerator = new ChunkGenerator(17 * 1024 + 763, 1024);
-
         ChunkGenerator.Chunk lastChunk = null;
 
-        for (ChunkGenerator.Chunk chunk : chunkGenerator) {
-            lastChunk = chunk;
+        for (Iterator<ChunkGenerator.Chunk> chunkGenerator = new ChunkGenerator(17 * 1024 + 763, 1024); chunkGenerator.hasNext(); ) {
+            lastChunk = chunkGenerator.next();
         }
 
         assertNotNull(lastChunk);
@@ -32,14 +31,12 @@ public class ChunkGeneratorTest {
 
     @Test
     public void testOneChunk() {
-        ChunkGenerator chunkGenerator = new ChunkGenerator(1024 + 763, 2048);
-
         int chunksCount = 0;
         ChunkGenerator.Chunk lastChunk = null;
 
-        for (ChunkGenerator.Chunk chunk : chunkGenerator) {
+        for (Iterator<ChunkGenerator.Chunk> chunkGenerator = new ChunkGenerator(1024 + 763, 2048); chunkGenerator.hasNext(); ) {
             chunksCount++;
-            lastChunk = chunk;
+            lastChunk = chunkGenerator.next();
         }
 
         assertEquals(1, chunksCount);
@@ -53,22 +50,19 @@ public class ChunkGeneratorTest {
     public void testConcurrentAccess() throws Throwable {
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        ChunkGenerator chunkGenerator = new ChunkGenerator(17 * 1024, 1024);
-
-
-        for (final Iterator<ChunkGenerator.Chunk> iterator = chunkGenerator.iterator(); iterator.hasNext(); ) {
+        for (final Iterator<ChunkGenerator.Chunk> chunkGenerator = new ChunkGenerator(17 * 1024, 1024); chunkGenerator.hasNext(); ) {
             try {
                 executor.submit(new Runnable() {
                     @Override
                     public void run() {
-                        iterator.next();
+                        chunkGenerator.next();
                     }
                 }).get();
             } catch (ExecutionException e) {
                 throw e.getCause();
             }
 
-            ChunkGenerator.Chunk chunk = iterator.next();
+            ChunkGenerator.Chunk chunk = chunkGenerator.next();
         }
     }
 

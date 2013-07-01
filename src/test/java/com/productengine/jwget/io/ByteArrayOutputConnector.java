@@ -1,5 +1,6 @@
 package com.productengine.jwget.io;
 
+import com.productengine.jwget.io.OutputConnector;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

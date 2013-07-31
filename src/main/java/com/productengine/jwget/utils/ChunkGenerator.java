@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.base.Objects.toStringHelper;
 import static java.lang.Math.min;
 
-public class ChunkGenerator implements Iterator<ChunkGenerator.Chunk> {
+public class ChunkGenerator implements Iterator<Chunk> {
 
     private final long totalSize;
     private final long chunkSize;
@@ -40,12 +40,9 @@ public class ChunkGenerator implements Iterator<ChunkGenerator.Chunk> {
         }
     }
 
-    public static interface Chunk {
-
-        long getOffset();
-
-        long getLength();
-
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 
     protected static final class ImmutableChunk implements Chunk {

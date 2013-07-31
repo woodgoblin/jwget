@@ -75,32 +75,4 @@ public class DownloaderTest {
         assertArrayEquals(expected, actual);
     }
 
-
-    @Test
-    public void testDownloadFailedData() throws Exception {
-        final byte[] expected = "oololoololoololololoololoololoololoololoololoololoololooololoololoololololo".getBytes();
-        final byte[] actual = new byte[expected.length];
-
-        downloader.download(
-                new Factory<InputConnector>() {
-                    @NotNull
-                    @Override
-                    public InputConnector create() {
-                        return new ByteArrayInputConnector(expected);
-                    }
-                },
-                new Factory<OutputConnector>() {
-                    @NotNull
-                    @Override
-                    public OutputConnector create() throws CreationException {
-                        return new ByteArrayOutputConnector(actual);
-                    }
-                },
-                new ChunkGenerator(expected.length + 5, 32),
-                10
-        );
-
-        assertArrayEquals(expected, actual);
-    }
-
 }

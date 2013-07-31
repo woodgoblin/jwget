@@ -6,46 +6,59 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import static com.google.common.base.Objects.toStringHelper;
 import static java.lang.Math.min;
 
 public class NetworkInputConnector implements InputConnector {
 
-    protected static final InputStream EMPTY_STREAM = new InputStream() {
-        @Override
-        public int read() throws IOException {
-            return -1;
-        }
-    };
-
     protected final InputStream inputStream;
     protected volatile long currentOffset;
+
+    protected final Object lock;
 
     public NetworkInputConnector(@NotNull URL url) throws IOException {
         inputStream = url.openConnection().getInputStream();
         currentOffset = 0;
+
+        lock = new Object();
     }
 
     @NotNull
     @Override
-    public synchronized InputStream getSubstream(long offset, long length) {
+    public InputStream getSubstream(long offset, long length) throws IOException {
         if (offset < 0)
             throw new IllegalArgumentException("offset can't be less then 0");
 
         if (length < 0)
             throw new IllegalArgumentException("length can't be less then 0");
 
-        if (offset < currentOffset)
-            throw new RuntimeException("Rollbacks are not supported");
+        synchronized (lock) {
+            if (offset < currentOffset)
+                throw new UnsupportedOperationException("Rollbacks are unsupported");
 
-        try {
-            inputStream.skip(offset - currentOffset);
+            try {
+                inputStream.skip(offset - currentOffset);
 
-            currentOffset = offset + length;
+                currentOffset = offset + length;
 
-            return new Substream(inputStream, length);
-        } catch (IOException e) {
-            return EMPTY_STREAM;
+                return new Substream(inputStream, length);
+            } catch (IOException e) {
+                throw new IOException("Connector is closed", e);
+            }
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        inputStream.close();
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("inputStream", inputStream)
+                .add("currentOffset", currentOffset)
+                .toString();
     }
 
     protected static class Substream extends InputStream {
@@ -102,11 +115,6 @@ public class NetworkInputConnector implements InputConnector {
         public void close() throws IOException {
             synchronized (inputStream) {
                 skip(bytesLeft);
-
-                // TODO: fix this
-                if (inputStream.available() == 0) {
-                    inputStream.close();
-                }
             }
         }
 

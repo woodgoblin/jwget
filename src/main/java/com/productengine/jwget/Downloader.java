@@ -2,20 +2,25 @@ package com.productengine.jwget;
 
 import com.productengine.jwget.io.InputConnector;
 import com.productengine.jwget.io.OutputConnector;
+import com.productengine.jwget.utils.Chunk;
 import com.productengine.jwget.utils.ChunkGenerator;
 import com.productengine.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.io.IOUtils.copyLarge;
 
 public class Downloader {
@@ -23,32 +28,58 @@ public class Downloader {
     private static final Logger LOGGER = LoggerFactory.getLogger(Downloader.class);
 
     public void download(
-        final @NotNull Factory<? extends InputConnector> inputConnectorFactory,
-        final @NotNull Factory<? extends OutputConnector> outputConnectorFactory,
-        final @NotNull Iterator<ChunkGenerator.Chunk> chunkIterator,
-        final int workersCount
-    ) throws Factory.CreationException, InterruptedException {
+            final @NotNull Factory<? extends InputConnector> inputConnectorFactory,
+            final @NotNull Factory<? extends OutputConnector> outputConnectorFactory,
+            final @NotNull Iterator<? extends Chunk> chunkIterator,
+            final int workersCount
+    ) throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(workersCount);
+        Queue<Closeable> toClose = new ArrayDeque<>();
 
         for (int i = 0; i < workersCount; i++) {
-            executorService.submit(new ChunkDownloadTask(
-                    inputConnectorFactory.create(),
-                    outputConnectorFactory.create(),
-                    chunkIterator
-            ));
+            try {
+                InputConnector inputConnector = inputConnectorFactory.create();
+                LOGGER.info("{} ", inputConnector);
+
+                try {
+                    OutputConnector outputConnector = outputConnectorFactory.create();
+                    LOGGER.info("{} has been successfully created", outputConnector);
+
+                    toClose.add(inputConnector);
+                    toClose.add(outputConnector);
+
+                    executorService.submit(new ChunkDownloadTask(inputConnector, outputConnector, chunkIterator));
+                } catch (Factory.CreationException e) {
+                    LOGGER.error("Creation of outputConnector has been failed", e);
+
+                    closeQuietly(inputConnector);
+                }
+            } catch (Factory.CreationException e) {
+                LOGGER.error("Creation of inputConnector has been failed", e);
+            }
         }
 
         executorService.shutdown();
-        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        try {
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        } finally {
+            while (!toClose.isEmpty()) {
+                Closeable closeable = toClose.poll();
+
+                closeQuietly(closeable);
+
+                LOGGER.info("{} has been closed", closeable);
+            }
+        }
     }
 
     protected static class ChunkDownloadTask implements Runnable {
 
         private final InputConnector inputConnector;
         private final OutputConnector outputConnector;
-        private final Iterator<ChunkGenerator.Chunk> chunkIterator;
+        private final Iterator<? extends Chunk> chunkIterator;
 
-        public ChunkDownloadTask(InputConnector inputConnector, OutputConnector outputConnector, Iterator<ChunkGenerator.Chunk> chunkIterator) {
+        public ChunkDownloadTask(InputConnector inputConnector, OutputConnector outputConnector, Iterator<? extends Chunk> chunkIterator) {
             this.inputConnector = inputConnector;
             this.outputConnector = outputConnector;
             this.chunkIterator = chunkIterator;
@@ -57,7 +88,7 @@ public class Downloader {
         @Override
         public void run() {
             while (chunkIterator.hasNext()) {
-                ChunkGenerator.Chunk chunk = chunkIterator.next();
+                Chunk chunk = chunkIterator.next();
 
                 try (
                         InputStream inputStream = inputConnector.getSubstream(chunk.getOffset(), chunk.getLength());

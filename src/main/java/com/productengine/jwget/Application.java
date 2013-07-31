@@ -2,6 +2,7 @@ package com.productengine.jwget;
 
 import com.productengine.jwget.io.FileOutputConnectorFactory;
 import com.productengine.jwget.io.NetworkInputConnectorFactory;
+import com.productengine.jwget.utils.Chunk;
 import com.productengine.jwget.utils.ChunkGenerator;
 import com.productengine.jwget.utils.Factory;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class Application {
     }
 
     public static void download(URL url, File destination, int workersCount, int chunkSize) throws Factory.CreationException, IOException, InterruptedException {
-        Iterator<ChunkGenerator.Chunk> chunkIterator = new ChunkGenerator(url.openConnection().getContentLength(), chunkSize);
+        Iterator<Chunk> chunkIterator = new ChunkGenerator(url.openConnection().getContentLength(), chunkSize);
         NetworkInputConnectorFactory inputConnectorFactory = new NetworkInputConnectorFactory(url);
         try (RandomAccessFile file = new RandomAccessFile(destination, "rws")) {
             FileOutputConnectorFactory outputConnectorFactory = new FileOutputConnectorFactory(file);

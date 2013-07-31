@@ -1,20 +1,36 @@
 package com.productengine.jwget.io;
 
 import org.apache.commons.io.IOUtils;
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class FileMatchers {
 
     public static <T extends File> Matcher<? super T> contentEqualsTo(T expected) {
-        return new ContentEqualsToMatcher<>(expected);
+        return new ContentEqualsToMatcher<T>(expected) {
+            @Override
+            protected boolean isContentEqual(FileReader l, FileReader r) throws IOException {
+                return IOUtils.contentEquals(l, r);
+            }
+        };
     }
 
-    protected static class ContentEqualsToMatcher<T extends File> extends TypeSafeDiagnosingMatcher<T> {
+    public static <T extends File> Matcher<? super T> contentEqualsToIgnoreEOL(T expected) {
+        return new ContentEqualsToMatcher<T>(expected) {
+            @Override
+            protected boolean isContentEqual(FileReader l, FileReader r) throws IOException {
+                return IOUtils.contentEqualsIgnoreEOL(l, r);
+            }
+        };
+    }
+
+    protected static abstract class ContentEqualsToMatcher<T extends File> extends TypeSafeDiagnosingMatcher<T> {
 
         protected final T expected;
 
@@ -28,7 +44,7 @@ public class FileMatchers {
                     FileReader actualStream = new FileReader(actual);
                     FileReader expectedStream = new FileReader(expected);
             ) {
-                boolean equals = IOUtils.contentEquals(actualStream, expectedStream);
+                boolean equals = isContentEqual(actualStream, expectedStream);
 
                 if (!equals) {
                     description
@@ -55,6 +71,10 @@ public class FileMatchers {
                     .appendValue(expected);
         }
 
+        protected abstract boolean isContentEqual(FileReader l, FileReader r) throws IOException;
+
     }
+
+
 
 }

@@ -6,22 +6,39 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
+
+import static com.google.common.base.Objects.toStringHelper;
 
 public class FileOutputConnector implements OutputConnector {
 
     protected final RandomAccessFile file;
+    protected volatile boolean closed;
 
     public FileOutputConnector(@NotNull RandomAccessFile file) {
         this.file = file;
+        this.closed = false;
     }
 
     @NotNull
     @Override
-    public OutputStream getSubstream(long offset, long length) {
+    public OutputStream getSubstream(long offset, long length) throws IOException {
+        if (closed)
+            throw new IOException("Connector is closed");
+
         return new BufferedSubstream(file, offset, length);
+    }
+
+    @Override
+    public void close() {
+        closed = true;
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("file", file)
+                .add("closed", closed)
+                .toString();
     }
 
     protected static class BufferedSubstream extends OutputStream {

@@ -8,6 +8,7 @@ import java.io.InputStream;
 public class ByteArrayInputConnector implements InputConnector {
 
     protected final byte[] bytes;
+    protected volatile boolean closed;
 
     public ByteArrayInputConnector(@NotNull byte[] bytes) {
         this.bytes = bytes;
@@ -15,9 +16,12 @@ public class ByteArrayInputConnector implements InputConnector {
 
     @NotNull
     @Override
-    public InputStream getSubstream(final long offset, final long length) {
+    public InputStream getSubstream(final long offset, final long length) throws IOException {
         if (offset > Integer.MAX_VALUE)
             throw new RuntimeException("offset bigger then Integer.MAX_VALUE isn't supported");
+
+        if (closed)
+            throw new IOException("Connector is closed");
 
         return new InputStream() {
 
@@ -33,4 +37,10 @@ public class ByteArrayInputConnector implements InputConnector {
             }
         };
     }
+
+    @Override
+    public void close() {
+        closed = true;
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.productengine.jwget;
 
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,11 +10,10 @@ import java.io.StringReader;
 import java.net.URL;
 
 import static com.productengine.jwget.Application.download;
-import static com.productengine.jwget.io.FileMatchers.contentEqualsTo;
+import static com.productengine.jwget.io.FileMatchers.contentEqualsToIgnoreEOL;
+import static java.nio.file.Files.delete;
 import static org.apache.commons.io.IOUtils.copy;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ApplicationTest {
 
@@ -38,7 +36,9 @@ public class ApplicationTest {
 
     @After
     public void tearDown() throws Exception {
-        destination.delete();
+        System.gc();
+
+        delete(destination.toPath());
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ApplicationTest {
         download(url, destination, workersCount, chunkSize);
 
         assertTrue(destination.exists());
-        assertThat(destination, contentEqualsTo(origin));
+        assertThat(destination, contentEqualsToIgnoreEOL(origin));
     }
 
     @Test
@@ -59,14 +59,7 @@ public class ApplicationTest {
         download(url, destination, workersCount, chunkSize);
 
         assertTrue(destination.exists());
-        assertThat(destination, contentEqualsTo(origin));
-    }
-
-    @Test
-    public void testManyTimes() throws Exception {
-        for (int i = 0; i < 30; i++) {
-            testFileRewrite();
-        }
+        assertThat(destination, contentEqualsToIgnoreEOL(origin));
     }
 
 }

@@ -5,6 +5,7 @@ import com.myzone.jwget.io.NetworkInputConnectorFactory;
 import com.myzone.jwget.utils.Chunk;
 import com.myzone.jwget.utils.ChunkGenerator;
 import com.myzone.jwget.utils.Factory;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class Application {
         download(url, destination, workersCount, chunkSize);
     }
 
-    public static void download(URL url, File destination, int workersCount, int chunkSize) throws Factory.CreationException, IOException, InterruptedException {
+    public static void download(@NotNull URL url, @NotNull File destination, int workersCount, int chunkSize) throws Factory.CreationException, IOException, InterruptedException {
         Iterator<Chunk> chunkIterator = new ChunkGenerator(url.openConnection().getContentLength(), chunkSize);
         NetworkInputConnectorFactory inputConnectorFactory = new NetworkInputConnectorFactory(url);
         try (RandomAccessFile file = new RandomAccessFile(destination, "rws")) {

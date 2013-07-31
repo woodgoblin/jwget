@@ -35,7 +35,7 @@ public class Downloader {
         ExecutorService executorService = Executors.newFixedThreadPool(workersCount);
         Queue<Closeable> toClose = new ArrayDeque<>();
 
-        for (int i = 0; i < workersCount; i++) {
+        for (int launchCounter = 0; launchCounter < workersCount; launchCounter++) {
             try {
                 InputConnector inputConnector = inputConnectorFactory.create();
                 LOGGER.info("{} ", inputConnector);

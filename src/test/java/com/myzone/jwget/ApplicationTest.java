@@ -1,4 +1,4 @@
-package com.productengine.jwget;
+package com.myzone.jwget;
 
 import org.junit.After;
 import org.junit.Before;
@@ -9,8 +9,8 @@ import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.net.URL;
 
-import static com.productengine.jwget.Application.download;
-import static com.productengine.jwget.io.FileMatchers.contentEqualsToIgnoreEOL;
+import static com.myzone.jwget.Application.download;
+import static com.myzone.jwget.io.FileMatchers.contentEqualsToIgnoreEOL;
 import static java.nio.file.Files.delete;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.junit.Assert.*;

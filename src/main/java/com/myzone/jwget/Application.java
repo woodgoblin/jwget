@@ -1,10 +1,10 @@
-package com.productengine.jwget;
+package com.myzone.jwget;
 
-import com.productengine.jwget.io.FileOutputConnectorFactory;
-import com.productengine.jwget.io.NetworkInputConnectorFactory;
-import com.productengine.jwget.utils.Chunk;
-import com.productengine.jwget.utils.ChunkGenerator;
-import com.productengine.jwget.utils.Factory;
+import com.myzone.jwget.io.FileOutputConnectorFactory;
+import com.myzone.jwget.io.NetworkInputConnectorFactory;
+import com.myzone.jwget.utils.Chunk;
+import com.myzone.jwget.utils.ChunkGenerator;
+import com.myzone.jwget.utils.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

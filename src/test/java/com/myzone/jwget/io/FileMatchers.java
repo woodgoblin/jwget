@@ -1,4 +1,4 @@
-package com.productengine.jwget.io;
+package com.myzone.jwget.io;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;

@@ -1,7 +1,7 @@
-package com.productengine.jwget;
+package com.myzone.jwget;
 
-import com.productengine.jwget.utils.Chunk;
-import com.productengine.jwget.utils.ChunkGenerator;
+import com.myzone.jwget.utils.Chunk;
+import com.myzone.jwget.utils.ChunkGenerator;
 import org.junit.Test;
 
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package com.productengine.jwget.utils;
+package com.myzone.jwget.utils;
 
 public interface Chunk {
 

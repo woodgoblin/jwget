@@ -1,11 +1,11 @@
-package com.productengine.jwget;
+package com.myzone.jwget;
 
-import com.productengine.jwget.io.ByteArrayInputConnector;
-import com.productengine.jwget.io.ByteArrayOutputConnector;
-import com.productengine.jwget.io.InputConnector;
-import com.productengine.jwget.io.OutputConnector;
-import com.productengine.jwget.utils.ChunkGenerator;
-import com.productengine.jwget.utils.Factory;
+import com.myzone.jwget.io.ByteArrayInputConnector;
+import com.myzone.jwget.io.ByteArrayOutputConnector;
+import com.myzone.jwget.io.InputConnector;
+import com.myzone.jwget.io.OutputConnector;
+import com.myzone.jwget.utils.ChunkGenerator;
+import com.myzone.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;

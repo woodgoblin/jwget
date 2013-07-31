@@ -1,4 +1,4 @@
-package com.productengine.jwget.utils;
+package com.myzone.jwget.utils;
 
 import org.jetbrains.annotations.NotNull;
 

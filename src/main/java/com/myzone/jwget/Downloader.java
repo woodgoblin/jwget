@@ -1,10 +1,9 @@
-package com.productengine.jwget;
+package com.myzone.jwget;
 
-import com.productengine.jwget.io.InputConnector;
-import com.productengine.jwget.io.OutputConnector;
-import com.productengine.jwget.utils.Chunk;
-import com.productengine.jwget.utils.ChunkGenerator;
-import com.productengine.jwget.utils.Factory;
+import com.myzone.jwget.io.InputConnector;
+import com.myzone.jwget.io.OutputConnector;
+import com.myzone.jwget.utils.Chunk;
+import com.myzone.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

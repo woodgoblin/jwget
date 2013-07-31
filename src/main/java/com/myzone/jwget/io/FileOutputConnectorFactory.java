@@ -1,6 +1,6 @@
-package com.productengine.jwget.io;
+package com.myzone.jwget.io;
 
-import com.productengine.jwget.utils.Factory;
+import com.myzone.jwget.utils.Factory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.RandomAccessFile;

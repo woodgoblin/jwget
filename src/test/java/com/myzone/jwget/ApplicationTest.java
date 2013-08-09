@@ -1,12 +1,13 @@
 package com.myzone.jwget;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URL;
 
 import static com.myzone.jwget.Application.download;
@@ -17,6 +18,9 @@ import static org.junit.Assert.*;
 
 public class ApplicationTest {
 
+    @Rule
+    public TemporaryFolder folder= new TemporaryFolder();
+
     private File origin;
 
     private URL url;
@@ -26,10 +30,14 @@ public class ApplicationTest {
 
     @Before
     public void setUp() throws Exception {
-        origin = new File("resources/origin.html");
+        InputStream is = ClassLoader.getSystemResourceAsStream("origin.html");
+        origin = folder.newFile("origin.html");
+        OutputStream outputStream = new FileOutputStream(origin);
+        IOUtils.copy(is, outputStream);
+        outputStream.close();
 
         url = new URL("http://programming-motherfucker.com/");
-        destination = new File("programming-motherfucker.html");
+        destination = folder.newFile("programming-motherfucker.html");
         workersCount = 4;
         chunkSize = 512;
     }
@@ -43,6 +51,7 @@ public class ApplicationTest {
 
     @Test
     public void testFileCreation() throws Exception {
+        delete(destination.toPath());
         assertFalse(destination.exists());
 
         download(url, destination, workersCount, chunkSize);
